@@ -1,11 +1,7 @@
 # DsigAlmacenesABC
 Aplicación desarrollada en Excel con Macros en Excel con base de datos de Acces
+<p>En este curso se creara un Sistema  de Invcentarios usando las herramientas de Excel y Acces.</p>
 
-Tarjeta de Productos en Excel Con Macros y Acces | 10
-
-✅Crear Relaciones en Acces
-✅Crear Vistas en Acces
-✅Crear Tarjeta de Productos en Excel
 
 #vba #excel #bigdata #sql  #sqlserver  #tutorialexcel  #macro  #excelservicios #aplicacionescontables  #cursoexcelservicios #chatgpt 
 

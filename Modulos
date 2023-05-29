@@ -1,0 +1,131 @@
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'  Todos los derechos reservados °DSIG PERÚ S.A.C                '
+'  ----------------------------------------------                '
+'  Autor: Fernando Mamani Blas                                   '
+'  Fecha: 26/05/2023 - Ultima Actualización                      '
+'  País: Perú - Arequipa                                         '
+'  Celular: 51 995155060                                         '
+'  Correo: excelservicios@hotmail.com - info@excelservicios.com  '
+'  Página: www.excelservicios.com            '
+'                                                                '
+'  "El Principio de la sabiduria es el temor a Dios"             '
+'                                                                '
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+Option Explicit
+Public PosFil, MaxFil As Integer
+Public PosCol As Integer
+Public RptHoja As Byte ' 1=QR en hoja Individual ; 2=QR  en la misma lista o tabla
+Public NombreHoja As String
+
+#If VBA7 And Win64 Then
+    Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" _
+      Alias "URLDownloadToFileA" ( _
+        ByVal pCaller As LongPtr, _
+        ByVal szURL As String, _
+        ByVal szFileName As String, _
+        ByVal dwReserved As LongPtr, _
+        ByVal lpfnCB As LongPtr _
+      ) As Long
+#Else
+    Private Declare Function URLDownloadToFile Lib "urlmon" _
+      Alias "URLDownloadToFileA" ( _
+        ByVal pCaller As LongPtr, _
+        ByVal szURL As String, _
+        ByVal szFileName As String, _
+        ByVal dwReserved As LongPtr, _
+        ByVal lpfnCB As LongPtr _
+      ) As Long
+#End If
+
+
+
+Function GenerarQR(dato As String)
+ Dim url, ruta As String
+ url = "https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=" & dato
+ ruta = ThisWorkbook.Path & "/qr.jpg"
+ 
+ URLDownloadToFile 0, url, ruta, 0, 0
+End Function
+
+
+Sub EliminarEtiquetas()
+Dim shp As Object
+On Error Resume Next
+Application.ScreenUpdating = False
+ThisWorkbook.Sheets(NombreHoja).Activate
+For Each shp In ActiveSheet.Shapes
+   If shp.Name = "Imagen 31" Then
+      Else
+        shp.Delete 'eliminamos todo
+    End If
+Next
+
+Application.ScreenUpdating = True
+End Sub
+
+
+Sub ImagenLista()
+Application.ScreenUpdating = False
+Dim m As Byte
+ThisWorkbook.Sheets(NombreHoja).Activate
+
+'Aqui Colocamos la Imagen en la Celda, esta Celda es dinamica
+ ActiveSheet.Cells(MaxFil, PosCol).Select
+
+'Insertamos la Imagen
+ActiveSheet.Pictures.Insert (ThisWorkbook.Path & "\qr.jpg")
+
+''Asignamos el Nombre a la Imagen de manera dinamica
+ActiveSheet.Shapes(PosFil).Name = PosFil
+
+'seleccionamos la Imagen
+ActiveSheet.Shapes(PosFil).Select
+
+'Redimensionamos la Celda,esta Celda es dinamica
+ Cells(MaxFil, PosCol).RowHeight = RowHeight
+ Cells(MaxFil, PosCol).ColumnWidth = ColWidth
+'Ejecutamos la Accion
+Call FitPic
+
+'
+Application.ScreenUpdating = True
+
+
+End Sub
+
+
+Sub FitPic()
+ 
+    Dim PicWtoHRatio As Single
+    Dim CellWtoHRatio As Single
+    With Selection
+        PicWtoHRatio = .Width / .Height
+    End With
+    With Selection.TopLeftCell
+        CellWtoHRatio = .Width / .RowHeight
+    End With
+    Select Case PicWtoHRatio / CellWtoHRatio
+    Case Is > 1
+        With Selection
+            .Width = .TopLeftCell.Width
+            .Height = .Width / PicWtoHRatio
+        End With
+    Case Else
+        With Selection
+            .Height = .TopLeftCell.RowHeight
+            .Width = .Height * PicWtoHRatio
+        End With
+    End Select
+    With Selection
+        .Top = .TopLeftCell.Top
+        .Left = .TopLeftCell.Left
+    End With
+    Exit Sub
+    With Selection
+        .ShapeRange.LockAspectRatio = msoFalse
+        .ShapeRange.Height = 100
+        .ShapeRange.Width = 100
+    End With
+
+End Sub
